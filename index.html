@@ -99,39 +99,6 @@
     box-shadow: 0 0 6px rgba(201,169,110,0.5);
   }
 
-  /* ── Header ── */
-  .header {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: clamp(12px, 3vw, 22px) 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-
-  .brand {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    animation: fadeDown 1s ease both;
-  }
-
-  .brand-name {
-    font-size: clamp(10px, 3vw, 14px);
-    letter-spacing: 0.45em;
-    color: var(--gold-light);
-    text-transform: uppercase;
-    opacity: 0.92;
-  }
-
-  .brand-line {
-    width: 36px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  }
 
   /* ── Arrow Buttons ── */
   .arrows {
@@ -250,15 +217,7 @@
 <svg class="ornament ornament-br" width="36" height="36" viewBox="0 0 40 40">
   <path d="M2 38 L2 2 L38 2" stroke="#c9a96e" stroke-width="1" fill="none"/>
 </svg>
-
-<!-- Header -->
-<header class="header">
-  <div class="brand">
-    <div class="brand-name">Sugar Cakery</div>
-    <div class="brand-line"></div>
-  </div>
-</header>
-
+  
 <!-- Arrows -->
 <div class="arrows">
   <button class="arrow prev" id="prevBtn" aria-label="Previous">
