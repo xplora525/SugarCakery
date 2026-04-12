@@ -1,334 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>Sugar Cakery</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-  :root {
-    --gold: #c9a96e;
-    --gold-light: #e8d5b0;
-    --rose: #d4848a;
-    --dark: #1a1008;
-  }
+:root {
+  --gold: #c9a96e;
+  --gold-light: #e8d5b0;
+  --rose: #d4848a;
+  --dark: #1a1008;
+}
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  html, body {
-    width: 100%;
-    height: 100%;
-    background: var(--dark);
-    overflow: hidden;
-    font-family: 'Cinzel', serif;
-  }
+body {
+  background: var(--dark);
+  overflow: hidden;
+  font-family: 'Cinzel', serif;
+}
 
-  /* ── Gallery Wrapper ── */
-  .gallery-wrapper {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-  }
+/* Wrapper */
+.gallery-wrapper {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
 
-  /* ── Slider Track ── */
-  .slider {
-    display: flex;
-    width: calc(100vw * 12);
-    height: 100%;
-    transition: transform 0.6s cubic-bezier(0.77, 0, 0.18, 1);
-    will-change: transform;
-  }
+/* Slider */
+.slider {
+  display: flex;
+  width: calc(100vw * 12); /* IMPORTANT */
+  height: 100%;
+  transition: transform 0.6s ease;
+}
 
-  /* ── Each Slide ── */
-  .slide {
-    width: 100vw;
-    height: 100%;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    background: var(--dark);
-  }
+/* Slide */
+.slide {
+  width: 100vw;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  /* Portrait / mobile: fill width, let height be natural */
-  .slide img {
-    width: 100%;
-    height: auto;
-    max-height: 100vh;
-    object-fit: contain;
-    display: block;
-  }
+.slide img {
+  width: 100%;
+  height: 100vh;
+  object-fit: contain;
+}
 
-  /* Landscape / wide screens: constrain by height */
-  @media (min-aspect-ratio: 3/4) {
-    .slide img {
-      width: auto;
-      height: 100vh;
-      max-width: 100vw;
-    }
-  }
+/* Arrows */
+.arrows {
+  position: fixed;
+  top: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+}
 
-  /* Soft vignette */
-  .slide::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(to top,   rgba(10,5,2,0.45) 0%, transparent 22%),
-      linear-gradient(to bottom, rgba(10,5,2,0.28) 0%, transparent 16%);
-    pointer-events: none;
-    z-index: 1;
-  }
+.arrow {
+  background: rgba(0,0,0,0.5);
+  border: none;
+  color: white;
+  font-size: 20px;
+  padding: 10px;
+  cursor: pointer;
+}
 
-  /* ── Progress Bar ── */
-  .progress-bar {
-    position: fixed;
-    top: 0; left: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--rose), var(--gold));
-    z-index: 200;
-    transition: width 0.6s cubic-bezier(0.77, 0, 0.18, 1);
-    box-shadow: 0 0 6px rgba(201,169,110,0.5);
-  }
-
-
-  /* ── Arrow Buttons ── */
-  .arrows {
-    position: fixed;
-    top: 50%;
-    left: 0; right: 0;
-    transform: translateY(-50%);
-    display: flex;
-    justify-content: space-between;
-    padding: 0 clamp(8px, 2vw, 18px);
-    z-index: 100;
-    pointer-events: none;
-  }
-
-  .arrow {
-    width: clamp(36px, 5vw, 46px);
-    height: clamp(36px, 5vw, 46px);
-    border: 1px solid rgba(201,169,110,0.4);
-    background: rgba(10,5,2,0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    pointer-events: all;
-    transition: background 0.3s, border-color 0.3s, transform 0.2s, opacity 0.3s;
-    color: var(--gold-light);
-  }
-
-  .arrow:hover  { background: rgba(201,169,110,0.2); border-color: var(--gold); }
-  .arrow:active { transform: scale(0.93); }
-
-  .arrow svg {
-    width: 15px; height: 15px;
-    stroke: currentColor; stroke-width: 1.5;
-    fill: none; stroke-linecap: round; stroke-linejoin: round;
-  }
-
-  .arrow.prev          { opacity: 0; pointer-events: none; }
-  .arrow.prev.visible  { opacity: 1; pointer-events: all; }
-  .arrow.next.hidden   { opacity: 0; pointer-events: none; }
-
-  /* ── Corner Ornaments ── */
-  .ornament {
-    position: fixed;
-    z-index: 99;
-    opacity: 0.22;
-    pointer-events: none;
-  }
-  .ornament-tl { top: 10px; left: 10px; }
-  .ornament-tr { top: 10px; right: 10px; transform: scaleX(-1); }
-  .ornament-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
-  .ornament-br { bottom: 10px; right: 10px; transform: scale(-1); }
-
-  /* ── Swipe Hint ── */
-  .swipe-hint {
-    position: fixed;
-    bottom: clamp(18px, 4vh, 36px);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    animation: fadeUp 1.5s ease both, hintFade 1s ease 2.8s forwards;
-    pointer-events: none;
-  }
-
-  .swipe-hint span {
-    font-size: 9px;
-    letter-spacing: 0.35em;
-    color: rgba(232,213,176,0.45);
-    text-transform: uppercase;
-  }
-
-  .swipe-line {
-    width: 1px; height: 18px;
-    background: linear-gradient(to bottom, var(--gold), transparent);
-    animation: swipePulse 1.5s ease-in-out infinite;
-  }
-
-  /* ── Animations ── */
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateX(-50%) translateY(14px); }
-    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-  }
-  @keyframes hintFade  { to { opacity: 0; } }
-  @keyframes swipePulse {
-    0%,100% { opacity: 0.5; transform: scaleY(1); }
-    50%     { opacity: 1;   transform: scaleY(1.3); }
-  }
+/* Progress bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--rose), var(--gold));
+  width: 0%;
+}
 </style>
 </head>
+
 <body>
 
-<!-- Progress bar -->
 <div class="progress-bar" id="progressBar"></div>
 
-<!-- Corner ornaments -->
-<svg class="ornament ornament-tl" width="36" height="36" viewBox="0 0 40 40">
-  <path d="M2 38 L2 2 L38 2" stroke="#c9a96e" stroke-width="1" fill="none"/>
-</svg>
-<svg class="ornament ornament-tr" width="36" height="36" viewBox="0 0 40 40">
-  <path d="M2 38 L2 2 L38 2" stroke="#c9a96e" stroke-width="1" fill="none"/>
-</svg>
-<svg class="ornament ornament-bl" width="36" height="36" viewBox="0 0 40 40">
-  <path d="M2 38 L2 2 L38 2" stroke="#c9a96e" stroke-width="1" fill="none"/>
-</svg>
-<svg class="ornament ornament-br" width="36" height="36" viewBox="0 0 40 40">
-  <path d="M2 38 L2 2 L38 2" stroke="#c9a96e" stroke-width="1" fill="none"/>
-</svg>
-  
-<!-- Arrows -->
 <div class="arrows">
-  <button class="arrow prev" id="prevBtn" aria-label="Previous">
-    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
-  <button class="arrow next" id="nextBtn" aria-label="Next">
-    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-  </button>
+  <button class="arrow" onclick="prev()">❮</button>
+  <button class="arrow" onclick="next()">❯</button>
 </div>
 
-<!-- Gallery -->
 <div class="gallery-wrapper">
   <div class="slider" id="slider">
-    <div class="slide"><img src="1.jpg" alt="Cake 1" loading="eager"></div>
-    <div class="slide"><img src="2.jpg" alt="Cake 2" loading="lazy"></div>
-    <div class="slide"><img src="3.jpg" alt="Cake 3" loading="lazy"></div>
-    <div class="slide"><img src="4.jpg" alt="Cake 4" loading="lazy"></div>
-    <div class="slide"><img src="5.jpg" alt="Cake 5" loading="lazy"></div>
-    <div class="slide"><img src="6.jpg" alt="Cake 6" loading="lazy"></div>
-    <div class="slide"><img src="7.jpg" alt="Cake 7" loading="lazy"></div>
-    <div class="slide"><img src="8.jpg" alt="Cake 8" loading="lazy"></div>
-    <div class="slide"><img src="9.jpg" alt="Cake 9" loading="lazy"></div>
-    <div class="slide"><img src="10.jpg" alt="Cake 10" loading="lazy"></div>
-    <div class="slide"><img src="11.jpg" alt="Cake 11" loading="lazy"></div>
-    <div class="slide"><img src="12.jpg" alt="Cake 12" loading="lazy"></div>
+
+    <div class="slide"><img src="1.jpg"></div>
+    <div class="slide"><img src="2.jpg"></div>
+    <div class="slide"><img src="3.jpg"></div>
+    <div class="slide"><img src="4.jpg"></div>
+    <div class="slide"><img src="5.jpg"></div>
+    <div class="slide"><img src="6.jpg"></div>
+    <div class="slide"><img src="7.jpg"></div>
+    <div class="slide"><img src="8.jpg"></div>
+    <div class="slide"><img src="9.jpg"></div>
+    <div class="slide"><img src="10.jpg"></div>
+    <div class="slide"><img src="11.jpg"></div>
+    <div class="slide"><img src="12.jpg"></div>
+
   </div>
 </div>
 
-<!-- Swipe hint -->
-<div class="swipe-hint">
-  <div class="swipe-line"></div>
-  <span>swipe</span>
-</div>
-
 <script>
-  const TOTAL  = 12;
-  let index    = 0;
-  let startX   = 0;
-  let startY   = 0;
-  let dragging = false;
+const TOTAL = 12;
+let index = 0;
 
-  const slider      = document.getElementById('slider');
-  const progressBar = document.getElementById('progressBar');
-  const prevBtn     = document.getElementById('prevBtn');
-  const nextBtn     = document.getElementById('nextBtn');
+const slider = document.getElementById("slider");
+const progressBar = document.getElementById("progressBar");
 
-  function updateUI() {
-    progressBar.style.width = `${((index + 1) / TOTAL) * 100}%`;
-    prevBtn.classList.toggle('visible', index > 0);
-    nextBtn.classList.toggle('hidden',  index >= TOTAL - 1);
+function update() {
+  slider.style.transform = `translateX(-${index * 100}vw)`;
+  progressBar.style.width = ((index + 1) / TOTAL) * 100 + "%";
+}
+
+function next() {
+  if (index < TOTAL - 1) {
+    index++;
+    update();
   }
+}
 
-  function goTo(i, instant) {
-    index = Math.max(0, Math.min(i, TOTAL - 1));
-    slider.style.transition = instant
-      ? 'none'
-      : 'transform 0.6s cubic-bezier(0.77,0,0.18,1)';
-    slider.style.transform = `translateX(-${index * 100}vw)`;
-    updateUI();
+function prev() {
+  if (index > 0) {
+    index--;
+    update();
   }
+}
 
-  const next = () => { if (index < TOTAL - 1) goTo(index + 1); };
-  const prev = () => { if (index > 0)         goTo(index - 1); };
-
-  prevBtn.addEventListener('click', prev);
-  nextBtn.addEventListener('click', next);
-
-  /* Touch */
-  document.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    dragging = true;
-  }, { passive: true });
-
-  document.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    const dx = e.touches[0].clientX - startX;
-    const dy = e.touches[0].clientY - startY;
-    if (Math.abs(dx) > Math.abs(dy)) {
-      slider.style.transition = 'none';
-      slider.style.transform  = `translateX(calc(-${index * 100}vw + ${dx * 0.35}px))`;
-    }
-  }, { passive: true });
-
-  document.addEventListener('touchend', e => {
-    if (!dragging) return;
-    dragging = false;
-    const diff = startX - e.changedTouches[0].clientX;
-    if      (diff >  50) next();
-    else if (diff < -50) prev();
-    else goTo(index);
-  }, { passive: true });
-
-  /* Mouse drag */
-  let mouseDown = false, mouseStartX = 0;
-  document.addEventListener('mousedown', e => { mouseDown = true; mouseStartX = e.clientX; });
-  document.addEventListener('mouseup',   e => {
-    if (!mouseDown) return;
-    mouseDown = false;
-    const diff = mouseStartX - e.clientX;
-    if      (diff >  60) next();
-    else if (diff < -60) prev();
-  });
-
-  /* Keyboard */
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
-  });
-
-  updateUI();
+update();
 </script>
+
 </body>
 </html>
